@@ -57,7 +57,7 @@
         "Original SKILL.md deleted",
         "Cross-references to kv, d1, r2, durable-objects, queues"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "split-5",

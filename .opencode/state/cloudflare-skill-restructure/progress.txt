@@ -59,3 +59,19 @@ Started: 2026-01-12
   - Consolidate config interfaces into single examples with inline comments
   - Reference full implementations in other files to avoid duplication
   - Compress similar API patterns (list/update/delete) into combined examples
+
+## Task - split-4
+- Split 1334-line workers/SKILL.md into 5 focused files
+- Files created:
+  - README.md (96 lines) - Overview, module pattern, essential commands, handler signatures
+  - configuration.md (147 lines) - wrangler.jsonc setup, bindings (KV, R2, D1, DO, queues, services), TypeScript
+  - api.md (137 lines) - Fetch handler, execution context, bindings access, Cache API, HTMLRewriter, WebSockets, Durable Objects, other handlers
+  - patterns.md (149 lines) - Error handling, CORS, routing, performance, streaming, testing, deployment, monitoring, security, gradual rollouts
+  - gotchas.md (99 lines) - CPU limits, statelessness, response streams, Node.js compat, global scope, limits table, common errors
+- Deleted: SKILL.md (1334 lines)
+- All files have cross-reference sections linking to kv, d1, r2, durable-objects, queues
+- **Learnings:**
+  - Aggressive inline compression: combine related concepts in single code blocks
+  - Reference other files to avoid duplication (e.g., rate limiting -> durable-objects)
+  - Use compact table format for limits/bindings reference
+  - Single-line patterns for simple examples when appropriate
