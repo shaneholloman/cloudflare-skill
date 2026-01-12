@@ -3,7 +3,7 @@
 {
   "name": "browser-worker",
   "main": "src/index.js",
-  "compatibility_date": "2023-03-14",
+  "compatibility_date": "2025-01-01", // Use current date for new projects
   "compatibility_flags": ["nodejs_compat"],
   "browser": {
     "binding": "MYBROWSER"

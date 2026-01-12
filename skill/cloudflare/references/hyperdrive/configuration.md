@@ -31,7 +31,7 @@ npx wrangler hyperdrive create my-db \
 
 ```jsonc
 {
-  "compatibility_date": "2024-09-23",
+  "compatibility_date": "2024-09-23", // Minimum for advanced features; use 2025-01-01 or later for new projects
   "compatibility_flags": ["nodejs_compat"],
   "hyperdrive": [
     {

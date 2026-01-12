@@ -7,7 +7,7 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "my-pages-app",
   "pages_build_output_dir": "./dist",
-  "compatibility_date": "2024-01-15",
+  "compatibility_date": "2025-01-01", // Use current date for new projects
   "compatibility_flags": ["nodejs_compat"],
   
   "vars": { "API_URL": "https://api.example.com" },

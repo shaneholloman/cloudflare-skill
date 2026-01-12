@@ -176,7 +176,7 @@ wrangler dev
 ```toml
 name = "my-worker"
 main = "src/index.js"
-compatibility_date = "2024-01-15"
+compatibility_date = "2025-01-01"  # Use current date for new projects
 compatibility_flags = ["nodejs_compat"]
 
 [[kv_namespaces]]

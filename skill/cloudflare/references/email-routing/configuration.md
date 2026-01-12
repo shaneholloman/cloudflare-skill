@@ -5,7 +5,7 @@
 ```toml
 name = "email-worker"
 main = "src/index.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-01-01"  # Use current date for new projects
 
 [[send_email]]
 name = "EMAIL"
@@ -17,7 +17,7 @@ Or in JSON:
 {
   "name": "email-worker",
   "main": "src/index.ts",
-  "compatibility_date": "2024-01-01",
+  "compatibility_date": "2025-01-01", // Use current date for new projects
   "send_email": [
     {
       "name": "EMAIL"

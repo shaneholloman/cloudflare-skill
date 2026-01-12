@@ -269,7 +269,7 @@ export default {
 # wrangler.toml
 name = "private-network-worker"
 main = "src/index.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-01-01"  # Use current date for new projects
 
 # No special configuration needed - TCP sockets are available by default
 # in Workers runtime

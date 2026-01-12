@@ -5,7 +5,7 @@
 ```toml
 name = "my-pages-project"
 pages_build_output_dir = "./dist"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-01-01"  # Use current date for new projects
 compatibility_flags = ["nodejs_compat"]
 
 # Bindings

@@ -39,7 +39,7 @@ curl -X PUT ".../scripts/$SCRIPT_NAME" \
       {"type": "kv_namespace", "name": "MY_KV", "namespace_id": "'$KV_ID'"}
     ],
     "tags": ["customer-123", "production"],
-    "compatibility_date": "2024-01-01"
+    "compatibility_date": "2025-01-01"  // Use current date for new projects
   };type=application/json' \
   -F 'worker.mjs=@worker.mjs;type=application/javascript+module'
 ```

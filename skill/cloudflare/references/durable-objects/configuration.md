@@ -6,7 +6,7 @@
 {
   "name": "my-worker",
   "main": "src/index.ts",
-  "compatibility_date": "2024-04-03",
+  "compatibility_date": "2024-04-03", // Minimum for RPC support; use 2025-01-01 or later for new projects
   "durable_objects": {
     "bindings": [
       { "name": "MY_DO", "class_name": "MyDO" },

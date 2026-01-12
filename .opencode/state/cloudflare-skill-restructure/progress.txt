@@ -209,3 +209,20 @@ Started: 2026-01-12
   - SQL params accept string | number | boolean | null for bind operations
   - JSON metadata should use Record<string, unknown> not any
   - Verified no remaining any types in d1 reference using rg
+
+## Task - fix-2
+- Updated compatibility_date in all config examples to 2025-01-01 or later
+- Files changed:
+  - 22 files updated across references/ (split files + unsplit SKILL.md files)
+  - All JSONC examples: added "// Use current date for new projects" comment
+  - All TOML examples: added "# Use current date for new projects" comment
+  - Special cases preserved:
+    - durable-objects: 2024-04-03 minimum for RPC, comment directs to use 2025-01-01+
+    - hyperdrive: 2024-09-23 minimum for features, comment directs to use 2025-01-01+
+    - static-assets: 2025-04-01 for SPA support (already compliant)
+    - containers: 2026-01-10 (already compliant)
+- **Learnings:**
+  - Feature-specific minimum dates documented in gotchas.md remain unchanged
+  - Standard config examples now consistently use 2025-01-01
+  - Comments guide users to use current dates for new projects
+  - Pattern: Update examples, preserve feature requirements

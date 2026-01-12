@@ -6,7 +6,7 @@
 ```toml
 name = "my-worker"
 main = "src/index.ts"
-compatibility_date = "2024-10-22"
+compatibility_date = "2025-01-01"  # Use current date for new projects
 
 [[workflows]]
 name = "my-workflow"           # Workflow name

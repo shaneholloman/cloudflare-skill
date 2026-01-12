@@ -493,7 +493,7 @@ export const config = envSchema.parse(process.env);
 # wrangler.toml
 name = "turn-credentials-api"
 main = "src/index.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-01-01"  # Use current date for new projects
 
 [vars]
 TURN_KEY_ID = "your-turn-key-id"

@@ -307,7 +307,7 @@ curl https://api.cloudflare.com/client/v4/accounts/{account_id}/ai-gateway/gatew
 # wrangler.toml
 name = "my-worker"
 main = "src/index.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-01-01"  # Use current date for new projects
 
 [ai]
 binding = "AI"

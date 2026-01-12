@@ -198,7 +198,7 @@
         "All wrangler.jsonc examples use 2025-01-01 or later",
         "Comment added: Use current date for new projects"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "fix-3",

@@ -9,7 +9,7 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "my-worker",
   "main": "src/index.ts",
-  "compatibility_date": "2024-01-01",
+  "compatibility_date": "2025-01-01", // Use current date for new projects
   "vars": {
     "API_URL": "https://api.example.com"
   }
@@ -21,7 +21,7 @@
 # wrangler.toml
 name = "my-worker"
 main = "src/index.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-01-01"  # Use current date for new projects
 
 [vars]
 API_URL = "https://api.example.com"
@@ -33,7 +33,7 @@ API_URL = "https://api.example.com"
 {
   "name": "my-worker",
   "main": "src/index.ts",
-  "compatibility_date": "2024-01-01",
+  "compatibility_date": "2025-01-01", // Use current date for new projects
   
   // Production bindings
   "vars": {

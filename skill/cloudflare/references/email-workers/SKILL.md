@@ -254,7 +254,7 @@ name = "EMAIL"
 ```toml
 name = "email-worker"
 main = "src/index.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-01-01"  # Use current date for new projects
 
 # Email binding
 [[send_email]]
