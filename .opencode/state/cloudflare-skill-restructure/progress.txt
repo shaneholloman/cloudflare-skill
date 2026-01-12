@@ -137,3 +137,20 @@ Started: 2026-01-12
   - Table compression: remove verbose columns when product names suffice
   - Extract reusable content to separate files rather than delete
   - Frontmatter references field helps agents prioritize key products
+## Task - crossref-1
+- Verified workers/README.md has complete cross-references
+- In This Reference section: links to configuration, api, patterns, gotchas
+- See Also section: links to kv, d1, r2, durable-objects, queues, wrangler
+- Files checked: skill/cloudflare/references/workers/README.md
+- **Learnings:**
+  - Cross-references already implemented in split-4 task
+  - Verification pass confirms existing structure meets requirements
+
+## Task - crossref-2
+- Added cross-references to pages/README.md
+- In This Reference section: links to configuration, api, patterns, gotchas (already present)
+- See Also section: added links to pages-functions, d1, kv
+- File modified: skill/cloudflare/references/pages/README.md (71→77 lines, well under <100 limit)
+- **Learnings:**
+  - Cross-product references help users discover complementary services
+  - Pattern: Pages + D1/KV for data, Pages Functions for routing logic

@@ -128,7 +128,7 @@
         "In This Reference section with links to config, api, patterns, gotchas",
         "See Also section with links to kv, d1, r2, durable-objects, queues"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "crossref-2",
@@ -138,7 +138,7 @@
         "In This Reference section with internal links",
         "See Also section with links to pages-functions, d1, kv"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "crossref-3",

@@ -62,9 +62,15 @@ npx wrangler pages deployment tail --project-name=my-project
 - [Framework Guides](https://developers.cloudflare.com/pages/framework-guides/)
 - [Discord #functions](https://discord.com/channels/595317990191398933/910978223968518144)
 
-## See Also
+## In This Reference
 
 - [configuration.md](./configuration.md) - wrangler.jsonc, build, env vars
 - [api.md](./api.md) - Functions API, bindings, context
 - [patterns.md](./patterns.md) - Full-stack patterns, frameworks
 - [gotchas.md](./gotchas.md) - Build issues, limits, debugging
+
+## See Also
+
+- [pages-functions](../pages-functions/) - File-based routing, middleware
+- [d1](../d1/) - SQL database for Pages Functions
+- [kv](../kv/) - Key-value storage for caching/state
