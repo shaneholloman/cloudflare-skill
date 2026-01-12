@@ -1,0 +1,264 @@
+{
+  "prdName": "cloudflare-skill-restructure",
+  "tasks": [
+    {
+      "id": "split-1",
+      "category": "split",
+      "description": "Split wrangler/ reference (1470 lines) into <200 line files",
+      "steps": [
+        "README.md exists with overview (<100 lines)",
+        "configuration.md exists with wrangler.jsonc setup (<150 lines)",
+        "api.md exists with runtime APIs (<150 lines)",
+        "patterns.md exists with common patterns (<150 lines)",
+        "gotchas.md exists with pitfalls/limits (<100 lines)",
+        "Original SKILL.md deleted",
+        "All files have cross-reference sections"
+      ],
+      "passes": false
+    },
+    {
+      "id": "split-2",
+      "category": "split",
+      "description": "Split cache-reserve/ reference (1439 lines) into <200 line files",
+      "steps": [
+        "README.md exists with overview (<100 lines)",
+        "configuration.md exists (<150 lines)",
+        "api.md exists (<150 lines)",
+        "patterns.md exists (<150 lines)",
+        "gotchas.md exists (<100 lines)",
+        "Original SKILL.md deleted"
+      ],
+      "passes": false
+    },
+    {
+      "id": "split-3",
+      "category": "split",
+      "description": "Split stream/ reference (1340 lines) into <200 line files",
+      "steps": [
+        "README.md exists with overview (<100 lines)",
+        "configuration.md exists (<150 lines)",
+        "api.md exists (<150 lines)",
+        "patterns.md exists (<150 lines)",
+        "gotchas.md exists (<100 lines)",
+        "Original SKILL.md deleted"
+      ],
+      "passes": false
+    },
+    {
+      "id": "split-4",
+      "category": "split",
+      "description": "Split workers/ reference (1334 lines) into <200 line files",
+      "steps": [
+        "README.md exists with overview (<100 lines)",
+        "configuration.md exists (<150 lines)",
+        "api.md exists (<150 lines)",
+        "patterns.md exists (<150 lines)",
+        "gotchas.md exists (<100 lines)",
+        "Original SKILL.md deleted",
+        "Cross-references to kv, d1, r2, durable-objects, queues"
+      ],
+      "passes": false
+    },
+    {
+      "id": "split-5",
+      "category": "split",
+      "description": "Split realtimekit/ reference (1244 lines) into <200 line files",
+      "steps": [
+        "README.md exists with overview (<100 lines)",
+        "configuration.md exists (<150 lines)",
+        "api.md exists (<150 lines)",
+        "patterns.md exists (<150 lines)",
+        "gotchas.md exists (<100 lines)",
+        "Original SKILL.md deleted"
+      ],
+      "passes": false
+    },
+    {
+      "id": "split-6",
+      "category": "split",
+      "description": "Split Tier 2 references (1100-1250 lines each)",
+      "steps": [
+        "terraform/ split into <200 line files",
+        "pulumi/ split into <200 line files",
+        "sandbox/ split into <200 line files",
+        "hyperdrive/ split into <200 line files",
+        "pages/ split into <200 line files",
+        "ddos/ split into <200 line files",
+        "workers-for-platforms/ split into <200 line files",
+        "workflows/ split into <200 line files",
+        "miniflare/ split into <200 line files",
+        "workerd/ split into <200 line files",
+        "cron-triggers/ split into <200 line files",
+        "secrets-store/ split into <200 line files",
+        "pages-functions/ split into <200 line files",
+        "network-interconnect/ split into <200 line files"
+      ],
+      "passes": false
+    },
+    {
+      "id": "split-7",
+      "category": "split",
+      "description": "Split Tier 3 references (700-1100 lines each)",
+      "steps": [
+        "All remaining reference files split to <200 lines",
+        "Each has README.md with overview",
+        "Each has appropriate sub-files (config, api, patterns, gotchas)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "trim-1",
+      "category": "trim",
+      "description": "Trim main SKILL.md from 232 to <200 lines",
+      "steps": [
+        "Frontmatter updated with improved description",
+        "Frontmatter includes references: field with top 5 products",
+        "Common patterns section moved to separate file",
+        "Loading references section removed",
+        "Product index Summary column removed",
+        "Total lines <200"
+      ],
+      "passes": false
+    },
+    {
+      "id": "crossref-1",
+      "category": "crossref",
+      "description": "Add cross-references to workers/ README.md",
+      "steps": [
+        "In This Reference section with links to config, api, patterns, gotchas",
+        "See Also section with links to kv, d1, r2, durable-objects, queues"
+      ],
+      "passes": false
+    },
+    {
+      "id": "crossref-2",
+      "category": "crossref",
+      "description": "Add cross-references to pages/ README.md",
+      "steps": [
+        "In This Reference section with internal links",
+        "See Also section with links to pages-functions, d1, kv"
+      ],
+      "passes": false
+    },
+    {
+      "id": "crossref-3",
+      "category": "crossref",
+      "description": "Add cross-references to agents-sdk/ README.md",
+      "steps": [
+        "In This Reference section with internal links",
+        "See Also section with links to durable-objects, d1, workers-ai, vectorize"
+      ],
+      "passes": false
+    },
+    {
+      "id": "crossref-4",
+      "category": "crossref",
+      "description": "Add cross-references to d1/ README.md",
+      "steps": [
+        "In This Reference section with internal links",
+        "See Also section with links to workers, hyperdrive"
+      ],
+      "passes": false
+    },
+    {
+      "id": "crossref-5",
+      "category": "crossref",
+      "description": "Add cross-references to durable-objects/ README.md",
+      "steps": [
+        "In This Reference section with internal links",
+        "See Also section with links to workers, do-storage"
+      ],
+      "passes": false
+    },
+    {
+      "id": "crossref-6",
+      "category": "crossref",
+      "description": "Add cross-references to all remaining split references",
+      "steps": [
+        "Each README.md has In This Reference section",
+        "Each README.md has See Also section where applicable"
+      ],
+      "passes": false
+    },
+    {
+      "id": "fix-1",
+      "category": "fix",
+      "description": "Fix type safety violation in d1 reference",
+      "steps": [
+        "Replace any[] with (string | number | boolean | null)[]",
+        "No any types in TypeScript examples"
+      ],
+      "passes": false
+    },
+    {
+      "id": "fix-2",
+      "category": "fix",
+      "description": "Update compatibility dates in all config examples",
+      "steps": [
+        "All wrangler.jsonc examples use 2025-01-01 or later",
+        "Comment added: Use current date for new projects"
+      ],
+      "passes": false
+    },
+    {
+      "id": "fix-3",
+      "category": "fix",
+      "description": "Convert all wrangler.toml to wrangler.jsonc format",
+      "steps": [
+        "No wrangler.toml examples remain",
+        "All config uses wrangler.jsonc"
+      ],
+      "passes": false
+    },
+    {
+      "id": "fix-4",
+      "category": "fix",
+      "description": "Add missing imports to code examples",
+      "steps": [
+        "agents-sdk examples include import { tool } from 'ai'",
+        "All code examples have necessary imports"
+      ],
+      "passes": false
+    },
+    {
+      "id": "polish-1",
+      "category": "polish",
+      "description": "Complete decision trees in main SKILL.md",
+      "steps": [
+        "Run code tree includes snippets/ and tail-workers/",
+        "Networking tree includes smart-placement/",
+        "Store data tree includes cache-reserve/"
+      ],
+      "passes": false
+    },
+    {
+      "id": "polish-2",
+      "category": "polish",
+      "description": "Standardize error handling in gotchas.md files",
+      "steps": [
+        "Each gotchas.md has Common Errors section",
+        "Errors have Cause and Solution subsections",
+        "Each gotchas.md has Limits table"
+      ],
+      "passes": false
+    }
+  ],
+  "context": {
+    "patterns": [
+      "Reference structure: references/<product>/README.md, configuration.md, api.md, patterns.md, gotchas.md",
+      "Line limits: README <100, others <150, none >200",
+      "Cross-ref template: In This Reference + See Also sections"
+    ],
+    "keyFiles": [
+      "SKILL.md",
+      "references/workers/SKILL.md",
+      "references/d1/SKILL.md",
+      "references/pages/SKILL.md"
+    ],
+    "nonGoals": [
+      "Rewriting content (quality is 4.7/5)",
+      "Adding new products",
+      "Changing technical recommendations"
+    ]
+  }
+}
