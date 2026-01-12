@@ -43,16 +43,12 @@ API Token permissions: `Account Secrets Store Edit/Read`
 - Simple single-Worker project
 - No cross-Worker sharing needed
 
-## Files
-
+## In This Reference
 - [configuration.md](./configuration.md) - Wrangler commands, binding config
 - [api.md](./api.md) - Binding API, get/put/delete operations
 - [patterns.md](./patterns.md) - Rotation, encryption, access control
 - [gotchas.md](./gotchas.md) - Security issues, limits, best practices
 
-## References
-
-- [Docs](https://developers.cloudflare.com/secrets-store/)
-- [Workers Integration](https://developers.cloudflare.com/secrets-store/integrations/workers/)
-- [API Reference](https://developers.cloudflare.com/api/resources/secrets_store/)
-- [Wrangler Commands](https://developers.cloudflare.com/workers/wrangler/commands/#secrets-store)
+## See Also
+- [workers](../workers/) - Worker bindings integration
+- [wrangler](../wrangler/) - CLI secret management commands

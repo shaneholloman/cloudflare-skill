@@ -88,3 +88,9 @@ wrangler tail --status error      # Filter by status
 - [api.md](./api.md) - Programmatic API (`unstable_startWorker`, `getPlatformProxy`)
 - [patterns.md](./patterns.md) - Common workflows and development patterns
 - [gotchas.md](./gotchas.md) - Common pitfalls, limits, and troubleshooting
+
+## See Also
+
+- [workers](../workers/) - Workers runtime API reference
+- [miniflare](../miniflare/) - Local testing with Miniflare
+- [workerd](../workerd/) - Runtime that powers `wrangler dev`

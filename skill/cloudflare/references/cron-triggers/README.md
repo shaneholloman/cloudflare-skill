@@ -77,9 +77,12 @@ curl "http://localhost:8787/__scheduled?cron=*/5+*+*+*+*"
 - **Propagation:** 15min global deployment
 - **Timezone:** UTC only
 
-## See Also
-
+## In This Reference
 - [configuration.md](./configuration.md) - wrangler config, env-specific schedules
 - [api.md](./api.md) - ScheduledController, handler params
 - [patterns.md](./patterns.md) - Use cases, batch processing, monitoring
 - [gotchas.md](./gotchas.md) - Timezone issues, debugging, limits
+
+## See Also
+- [workflows](../workflows/) - Alternative for long-running scheduled tasks
+- [workers](../workers/) - Worker runtime documentation

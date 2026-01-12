@@ -26,9 +26,12 @@ Autonomous, always-on protection against DDoS attacks across L3/4 and L7.
 
 Zone overrides take precedence over account overrides.
 
-## See Also
-
+## In This Reference
 - [configuration.md](./configuration.md) - Dashboard & rule setup
 - [api.md](./api.md) - API endpoints & management
 - [patterns.md](./patterns.md) - Protection strategies
 - [gotchas.md](./gotchas.md) - False positives & tuning
+
+## See Also
+- [waf](../waf/) - Application-layer security rules
+- [bot-management](../bot-management/) - Bot detection and mitigation

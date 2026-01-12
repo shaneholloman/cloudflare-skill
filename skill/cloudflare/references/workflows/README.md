@@ -52,11 +52,13 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
 - **Parallel**: `Promise.all()` for concurrent steps
 - **Idempotency**: Check-then-execute patterns
 
-## Further Reading
+## In This Reference
+- [configuration.md](./configuration.md) - wrangler.toml setup, step config
+- [api.md](./api.md) - Step APIs, instance management, state
+- [patterns.md](./patterns.md) - Common workflows, orchestration patterns
+- [gotchas.md](./gotchas.md) - Timeouts, limits, debugging strategies
 
-- [configuration.md](./configuration.md) - wrangler.toml, step config
-- [api.md](./api.md) - Step APIs, instance management
-- [patterns.md](./patterns.md) - Common workflows, orchestration
-- [gotchas.md](./gotchas.md) - Timeouts, limits, debugging
-
-[Official Docs](https://developers.cloudflare.com/workflows/)
+## See Also
+- [durable-objects](../durable-objects/) - Alternative stateful approach
+- [queues](../queues/) - Message-driven workflows
+- [workers](../workers/) - Entry point for workflow instances

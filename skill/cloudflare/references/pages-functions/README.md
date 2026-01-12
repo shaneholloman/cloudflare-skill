@@ -49,9 +49,13 @@ export function onRequest(context) {
 - **TypeScript:** Full type support via `@cloudflare/workers-types`
 - **Advanced mode:** Use `_worker.js` for custom routing logic
 
-## See Also
-
+## In This Reference
 - [configuration.md](./configuration.md) - Routes, headers, redirects, wrangler config
 - [api.md](./api.md) - EventContext, handlers, bindings
 - [patterns.md](./patterns.md) - Auth, CORS, rate limiting, forms, caching
 - [gotchas.md](./gotchas.md) - Common issues, debugging, limits
+
+## See Also
+- [pages](../pages/) - Pages platform overview and static site deployment
+- [workers](../workers/) - Workers runtime API reference
+- [d1](../d1/) - D1 database integration with Pages Functions

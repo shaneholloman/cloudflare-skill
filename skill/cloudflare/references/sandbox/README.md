@@ -81,10 +81,13 @@ EXPOSE 8080 3000  # Required for wrangler dev
 - `normalizeId: true` for preview URLs
 - Retry on `CONTAINER_NOT_READY`
 
-## Resources
+## In This Reference
+- [configuration.md](./configuration.md) - Config, CLI, environment setup
+- [api.md](./api.md) - Programmatic API, testing patterns
+- [patterns.md](./patterns.md) - Common workflows, CI/CD integration
+- [gotchas.md](./gotchas.md) - Issues, limits, best practices
 
-- [Configuration](./configuration.md) - Config, CLI, environment
-- [API Reference](./api.md) - Programmatic API, testing
-- [Patterns](./patterns.md) - Common workflows, CI/CD
-- [Gotchas](./gotchas.md) - Issues, limits, best practices
-- [Official Docs](https://developers.cloudflare.com/sandbox/)
+## See Also
+- [durable-objects](../durable-objects/) - Sandbox runs on DO infrastructure
+- [containers](../containers/) - Container runtime fundamentals
+- [workers](../workers/) - Entry point for sandbox requests

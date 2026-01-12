@@ -37,12 +37,13 @@ Request → Dispatch Worker → Determines user Worker → env.DISPATCHER.get("c
 - Static assets support
 - Tags for bulk operations
 
-## Quick Start
+## In This Reference
+- [configuration.md](./configuration.md) - Namespace setup, dispatch worker config
+- [api.md](./api.md) - User worker API, dispatch API, outbound worker
+- [patterns.md](./patterns.md) - Multi-tenancy, routing, egress control
+- [gotchas.md](./gotchas.md) - Limits, isolation issues, best practices
 
-See [configuration.md](./configuration.md), [api.md](./api.md), [patterns.md](./patterns.md), [gotchas.md](./gotchas.md)
-
-## Refs
-
-- [Docs](https://developers.cloudflare.com/cloudflare-for-platforms/workers-for-platforms/)
-- [Starter Kit](https://github.com/cloudflare/templates/tree/main/worker-publisher-template)
-- [VibeSDK](https://github.com/cloudflare/vibesdk)
+## See Also
+- [workers](../workers/) - Core Workers runtime documentation
+- [durable-objects](../durable-objects/) - Stateful multi-tenant patterns
+- [sandbox](../sandbox/) - Alternative for untrusted code execution

@@ -35,13 +35,13 @@ workerd test config.capnp
 - **Compatibility date**: Feature gate (always set!)
 - **Modules**: ES modules (recommended) or service worker syntax
 
-## See Also
+## In This Reference
 - [configuration.md](./configuration.md) - Config format, services, bindings
 - [api.md](./api.md) - Runtime APIs, C++ embedding
 - [patterns.md](./patterns.md) - Multi-service, DO, proxies
 - [gotchas.md](./gotchas.md) - Common errors, debugging
 
-## References
-- [GitHub](https://github.com/cloudflare/workerd)
-- [Compat Dates](https://developers.cloudflare.com/workers/configuration/compatibility-dates/)
-- [workerd.capnp](https://github.com/cloudflare/workerd/blob/main/src/workerd/server/workerd.capnp)
+## See Also
+- [workers](../workers/) - Workers runtime API documentation
+- [miniflare](../miniflare/) - Testing tool built on workerd
+- [wrangler](../wrangler/) - CLI that uses workerd for local dev

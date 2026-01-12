@@ -85,9 +85,12 @@ curl -X PATCH "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/cache/cache_r
 curl -I https://example.com/asset.jpg | grep -i cache
 ```
 
-## See Also
+## In This Reference
+- [configuration.md](./configuration.md) - Setup, API, and Cache Rules
+- [api.md](./api.md) - Purging, monitoring, and management APIs
+- [patterns.md](./patterns.md) - Best practices and architecture patterns
+- [gotchas.md](./gotchas.md) - Common issues, troubleshooting, limits
 
-- [Configuration](./configuration.md) - Setup, API, and Cache Rules
-- [API Reference](./api.md) - Purging, monitoring, and management APIs
-- [Patterns](./patterns.md) - Best practices and architecture patterns
-- [Gotchas](./gotchas.md) - Common issues, troubleshooting, limits
+## See Also
+- [r2](../r2/) - Cache Reserve built on R2 storage
+- [workers](../workers/) - Workers integration with Cache API

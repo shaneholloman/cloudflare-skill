@@ -52,11 +52,12 @@ export default {
 ✅ Global access to single-region DBs, high read ratios, popular queries, connection-heavy loads
 ❌ Write-heavy, real-time data (<1s), single-region apps close to DB
 
-## See Also
-
+## In This Reference
 - [configuration.md](./configuration.md) - Setup, wrangler config
 - [api.md](./api.md) - Binding APIs, query patterns
 - [patterns.md](./patterns.md) - Use cases, ORMs
 - [gotchas.md](./gotchas.md) - Limits, troubleshooting
 
-[Docs](https://developers.cloudflare.com/hyperdrive/) | [Discord #hyperdrive](https://discord.cloudflare.com)
+## See Also
+- [d1](../d1/) - Serverless SQLite alternative for edge-native apps
+- [workers](../workers/) - Worker runtime with database bindings

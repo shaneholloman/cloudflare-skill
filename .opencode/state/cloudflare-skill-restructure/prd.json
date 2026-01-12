@@ -178,7 +178,7 @@
         "Each README.md has In This Reference section",
         "Each README.md has See Also section where applicable"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "fix-1",

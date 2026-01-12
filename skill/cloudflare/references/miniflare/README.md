@@ -50,15 +50,13 @@ console.log(await res.text()); // Hello Miniflare!
 await mf.dispose();
 ```
 
-## See Also
-
+## In This Reference
 - [configuration.md](./configuration.md) - Config options, bindings, wrangler.toml
 - [api.md](./api.md) - Programmatic API, methods, event dispatching
 - [patterns.md](./patterns.md) - Testing patterns, CI, mocking
 - [gotchas.md](./gotchas.md) - Compatibility issues, limits, debugging
 
-## Resources
-
-- [Miniflare Docs](https://developers.cloudflare.com/workers/testing/miniflare/)
-- [Miniflare GitHub](https://github.com/cloudflare/workers-sdk/tree/main/packages/miniflare)
-- [Vitest Integration](https://developers.cloudflare.com/workers/testing/vitest-integration/) (recommended)
+## See Also
+- [wrangler](../wrangler/) - CLI tool that embeds Miniflare for `wrangler dev`
+- [workerd](../workerd/) - Runtime that powers Miniflare
+- [workers](../workers/) - Workers runtime API documentation
