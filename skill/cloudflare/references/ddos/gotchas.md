@@ -4,94 +4,87 @@
 
 ### "False positives blocking legitimate traffic"
 
-**Cause:** Sensitivity too high, wrong action, or missing exceptions
-**Solution:**
-```typescript
-// Query GraphQL API for flagged requests
-const query = `
-  query {
-    viewer {
-      zones(filter: { zoneTag: "${zoneId}" }) {
-        httpRequestsAdaptiveGroups(
-          filter: { ruleId: "${ruleId}", action: "log" }
-          limit: 100
-          orderBy: [datetime_DESC]
-        ) {
-          dimensions {
-            clientCountryName
-            clientRequestHTTPHost
-            clientRequestPath
-            userAgent
-          }
-          count
-        }
-      }
-    }
-  }
-`;
-```
-
+**Cause**: Sensitivity too high, wrong action, or missing exceptions  
+**Solution**:
 1. Lower sensitivity for specific rule/category
 2. Use `log` action first to validate (Enterprise Advanced)
 3. Add exception with custom expression (e.g., allowlist IPs)
-4. Or allowlist by IP/ASN/country
+4. Query flagged requests via GraphQL Analytics API to identify patterns
 
 ### "Attacks getting through"
 
-**Cause:** Sensitivity too low or wrong action
-**Solution:**
+**Cause**: Sensitivity too low or wrong action  
+**Solution**: Increase to `default` sensitivity and use `block` action:
 ```typescript
-// Increase to default (high) sensitivity
 const config = {
   rules: [{
     expression: "true",
     action: "execute",
-    action_parameters: {
-      id: managedRulesetId,
-      overrides: { sensitivity_level: "default", action: "block" },
-    },
+    action_parameters: { id: managedRulesetId, overrides: { sensitivity_level: "default", action: "block" } },
   }],
 };
 ```
 
 ### "Adaptive rules not working"
 
-**Cause:** Insufficient traffic history (needs 7 days)
-**Solution:** Wait for baseline to establish, check dashboard for adaptive rule status
+**Cause**: Insufficient traffic history (needs 7 days)  
+**Solution**: Wait for baseline to establish, check dashboard for adaptive rule status
 
 ### "Zone override ignored"
 
-**Cause:** Account overrides conflict with zone overrides
-**Solution:** Configure at zone level OR remove zone overrides to use account-level
+**Cause**: Account overrides conflict with zone overrides  
+**Solution**: Configure at zone level OR remove zone overrides to use account-level
 
 ### "Log action not available"
 
-**Cause:** Not on Enterprise Advanced DDoS plan
-**Solution:** Use `managed_challenge` with low sensitivity for testing
+**Cause**: Not on Enterprise Advanced DDoS plan  
+**Solution**: Use `managed_challenge` with low sensitivity for testing
 
 ### "Rule limit exceeded"
 
-**Cause:** Too many override rules (Free/Pro/Business: 1, Enterprise Advanced: 10)
-**Solution:** Combine conditions in single expression using `and`/`or`
+**Cause**: Too many override rules (Free/Pro/Business: 1, Enterprise Advanced: 10)  
+**Solution**: Combine conditions in single expression using `and`/`or`
 
 ### "Cannot override rule"
 
-**Cause:** Rule is read-only
-**Solution:** Check API response for read-only indicator, use different rule
+**Cause**: Rule is read-only  
+**Solution**: Check API response for read-only indicator, use different rule
 
 ### "Cannot disable DDoS protection"
 
-**Cause:** DDoS managed rulesets cannot be fully disabled (always-on protection)
-**Solution:** Set `sensitivity_level: "eoff"` for minimal mitigation
+**Cause**: DDoS managed rulesets cannot be fully disabled (always-on protection)  
+**Solution**: Set `sensitivity_level: "eoff"` for minimal mitigation
+
+### "Expression not allowed"
+
+**Cause**: Custom expressions require Enterprise Advanced plan  
+**Solution**: Use `expression: "true"` for all traffic, or upgrade plan
+
+### "Managed ruleset not found"
+
+**Cause**: Zone/account doesn't have DDoS managed ruleset, or incorrect phase  
+**Solution**: Verify ruleset exists via `client.rulesets.list()`, check phase name (`ddos_l7` or `ddos_l4`)
+
+## API Error Codes
+
+| Error Code | Message | Cause | Solution |
+|------------|---------|-------|----------|
+| 10000 | Authentication error | Invalid/missing API token | Check token has DDoS permissions |
+| 81000 | Ruleset validation failed | Invalid rule structure | Verify `action_parameters.id` is managed ruleset ID |
+| 81020 | Expression not allowed | Custom expressions on wrong plan | Use `"true"` or upgrade to Enterprise Advanced |
+| 81021 | Rule limit exceeded | Too many override rules | Reduce rules or upgrade (Enterprise Advanced: 10) |
+| 81022 | Invalid sensitivity level | Wrong sensitivity value | Use: `default`, `medium`, `low`, `eoff` |
+| 81023 | Invalid action | Wrong action for plan | Enterprise Advanced only: `log` action |
 
 ## Limits
 
-| Resource/Limit | Value | Notes |
-|----------------|-------|-------|
-| Override rules (Free/Pro/Business) | 1 | Per zone |
-| Override rules (Enterprise Advanced) | 10 | Per zone |
-| Traffic history for adaptive | 7 days | Required |
-| Sensitivity levels | eoff, low, medium, default, high | Configurable |
+| Resource/Limit | Free/Pro/Business | Enterprise | Enterprise Advanced |
+|----------------|-------------------|------------|---------------------|
+| Override rules per zone | 1 | 1 | 10 |
+| Custom expressions | ✗ | ✗ | ✓ |
+| Log action | ✗ | ✗ | ✓ |
+| Adaptive DDoS | ✗ | ✓ | ✓ |
+| Traffic history required | - | 7 days | 7 days |
 
 ## Tuning Strategy
 

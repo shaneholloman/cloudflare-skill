@@ -1,67 +1,81 @@
-### Best Practices
-- Keep files under size limits
-- Use supported formats
-- Maintain valid Service API token
-- Clean up outdated content regularly
-- Monitor Vectorize index limits
+# AI Search Gotchas
 
-## Common Errors
+## Type Safety
 
-### "Indexing failed"
+**Timestamp precision:** Use seconds (10-digit), not milliseconds.
+```typescript
+const nowInSeconds = Math.floor(Date.now() / 1000); // Correct
+```
 
-**Cause:** Unsupported file format, file too large, or invalid content
-**Solution:** Verify file format supported, check file size limits, ensure content valid
+**Folder prefix matching:** Use `gte` for "starts with" on paths.
+```typescript
+filters: { column: "folder", operator: "gte", value: "docs/api/" } // Matches nested
+```
 
-### "API token invalid"
+## Filter Limitations
 
-**Cause:** Token expired, revoked, or wrong permissions
-**Solution:** Create new API token with correct permissions (AI Search - Read, AI Search Edit)
+| Limit | Value |
+|-------|-------|
+| Max nesting depth | 2 levels |
+| Filters per compound | 10 |
+| `or` operator | Same column, `eq` only |
 
-### "Query returned no results"
+**OR restriction example:**
+```typescript
+// ✅ Valid: same column, eq only
+{ operator: "or", filters: [
+  { column: "folder", operator: "eq", value: "docs/" },
+  { column: "folder", operator: "eq", value: "guides/" }
+]}
+```
 
-**Cause:** Index not complete, query too specific, or no matching content
-**Solution:** Wait for indexing to complete, broaden query terms, check indexed content
+## Indexing Issues
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| File not indexed | Unsupported format or >4MB | Check format (.md/.txt/.html/.pdf/.doc/.csv/.json) |
+| Index out of sync | 6-hour index cycle | Wait or use "Force Sync" (30s rate limit) |
+| Empty results | Index incomplete | Check dashboard for indexing status |
+
+## Auth Errors
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `AutoRAGUnauthorizedError` | Invalid/missing token | Create Service API token with AI Search permissions |
+| `AutoRAGNotFoundError` | Wrong instance name | Verify exact name from dashboard |
+
+## Performance
+
+**Slow responses (>3s):**
+```typescript
+// Add score threshold + limit results
+ranking_options: { score_threshold: 0.5 },
+max_num_results: 10
+```
+
+**Empty results debug:**
+1. Remove filters, test basic query
+2. Lower `score_threshold` to 0.1
+3. Check index is populated
 
 ## Limits
 
-| Resource/Limit | Value | Notes |
-|----------------|-------|-------|
-| Max file size | Varies by format | Check docs |
-| Max files per instance | Varies by plan | Monitor dashboard |
-| API token quota | Per account | Create with minimal perms |
-| Vectorize index | Shared limits | Monitor usage |
+| Resource | Limit |
+|----------|-------|
+| Instances per account | 10 |
+| Files per instance | 100,000 |
+| Max file size | 4 MB |
+| Index frequency | 6 hours |
 
-## Configuration via Dashboard
+## Anti-Patterns
 
-### 1. Create Instance
-```
-Dashboard → AI Search → Create
-→ Choose data source (R2 bucket or Website)
-→ Configure settings
-→ Create
+**Use env vars for instance names:**
+```typescript
+const answer = await env.AI.autorag(env.AI_SEARCH_INSTANCE).aiSearch({...});
 ```
 
-### 2. Monitor Indexing
-```
-AI Search → Select instance → Overview
-View: indexing status, progress, stats
-```
-
-### 3. Test Queries
-```
-AI Search → Select instance → Playground
-→ "Search with AI" or "Search"
-→ Enter query
-```
-
-### 4. Get API Token
-```
-AI Search → Select instance → Use AI Search → API
-→ Create API Token
-→ Permissions: "AI Search - Read", "AI Search Edit"
-```
-
-### 5. Connect to Application
-```
-AI Search → Select instance → Connect
+**Handle specific error types:**
+```typescript
+if (error instanceof AutoRAGNotFoundError) { /* 404 */ }
+if (error instanceof AutoRAGUnauthorizedError) { /* 401 */ }
 ```

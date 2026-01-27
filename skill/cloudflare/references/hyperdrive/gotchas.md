@@ -4,6 +4,11 @@ See [README.md](./README.md), [configuration.md](./configuration.md), [api.md](.
 
 ## Common Errors
 
+### "Too many open connections" / "Connection limit exceeded"
+
+**Cause:** Workers have a hard limit of **6 concurrent connections per invocation**  
+**Solution:** Set `max: 5` in driver config, reuse connections, ensure proper cleanup with `client.end()` or `ctx.waitUntil(conn.end())`
+
 ### "Failed to acquire a connection (Pool exhausted)"
 
 **Cause:** All connections in pool are in use, often due to long-running transactions  
@@ -34,6 +39,11 @@ See [README.md](./README.md), [configuration.md](./configuration.md), [api.md](.
 **Cause:** Query is mutating (INSERT/UPDATE/DELETE), contains volatile functions (NOW(), RANDOM()), or caching disabled  
 **Solution:** Verify query is non-mutating SELECT, avoid volatile functions, confirm caching enabled, use `wrangler dev --remote` to test, and set `prepare=true` for postgres.js
 
+### "Slow multi-query Workers despite Hyperdrive"
+
+**Cause:** Worker executing at edge, each query round-trips to DB region  
+**Solution:** Enable Smart Placement (`"placement": {"mode": "smart"}` in wrangler.jsonc) to execute Worker near DB. See [patterns.md](./patterns.md) Multi-Query pattern.
+
 ### "Local database connection failed"
 
 **Cause:** `localConnectionString` incorrect or database not running  
@@ -49,6 +59,7 @@ See [README.md](./README.md), [configuration.md](./configuration.md), [api.md](.
 | Limit | Free | Paid | Notes |
 |-------|------|------|-------|
 | Max configs | 10 | 25 | Hyperdrive configurations per account |
+| Worker connections | 6 | 6 | Max concurrent connections per Worker invocation |
 | Username/DB name | 63 bytes | 63 bytes | Maximum length |
 | Connection timeout | 15s | 15s | Time to establish connection |
 | Idle timeout | 10 min | 10 min | Connection idle timeout |

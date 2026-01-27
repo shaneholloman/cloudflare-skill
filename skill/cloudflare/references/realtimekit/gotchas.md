@@ -67,6 +67,29 @@ Enable `echoCancellation: true` in `mediaConfiguration.audio`, use headphones, m
 **Solution:**
 Use Chrome/Edge/Firefox (Safari limited support), check browser permissions, try different `displaySurface` values ('window', 'monitor', 'browser')
 
+### "How do I schedule meetings?"
+
+**Cause:** RealtimeKit has no built-in scheduling system
+**Solution:**
+Store meeting IDs in your database with timestamps. Generate participant tokens only when user should join. Example:
+```typescript
+// Store in DB
+{ meetingId: 'abc123', scheduledFor: '2026-02-15T10:00:00Z', userId: 'user456' }
+
+// Generate token when user clicks "Join" near scheduled time
+const response = await fetch('/api/join-meeting', {
+  method: 'POST',
+  body: JSON.stringify({ meetingId: 'abc123' })
+});
+const { authToken } = await response.json();
+```
+
+### "Recording not starting"
+
+**Cause:** Preset lacks recording permissions, no active session, or API call from client
+**Solution:**
+Verify preset has `canRecord: true` and `canStartStopRecording: true`, ensure session is active (at least one participant), make recording API calls server-side only
+
 ## Limits
 
 | Resource | Limit |

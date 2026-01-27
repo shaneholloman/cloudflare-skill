@@ -14,6 +14,8 @@
 }
 ```
 
+**Migration lifecycle:** Migrations run once per deployment. Existing DO instances get new storage backend on next invocation. Renaming/removing classes requires `renamed_classes` or `deleted_classes` entries.
+
 ## KV-backed (Legacy)
 
 **wrangler.jsonc:**
@@ -58,7 +60,13 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const id = env.MY_DO.idFromName('singleton');
     const stub = env.MY_DO.get(id);
-    return stub.fetch(request);
+    
+    // Modern RPC: call methods directly (recommended)
+    const result = await stub.someMethod();
+    return Response.json(result);
+    
+    // Legacy: forward request (still works)
+    // return stub.fetch(request);
   }
 }
 ```

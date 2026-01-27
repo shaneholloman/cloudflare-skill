@@ -1,60 +1,88 @@
-## Best Practices
+# Workers Playground Gotchas
 
-### 1. Use Async/Await
-Always use `async/await` for cleaner asynchronous code:
+## Platform Limitations
 
-```javascript
-// Good
-export default {
-  async fetch(request, env, ctx) {
-    const response = await fetch('https://api.example.com');
-    const data = await response.json();
-    return new Response(JSON.stringify(data));
-  },
-};
+| Limitation | Impact | Workaround |
+|------------|--------|------------|
+| Safari broken | Preview fails | Use Chrome/Firefox/Edge |
+| TypeScript unsupported | TS syntax errors | Write plain JS or use JSDoc |
+| No bindings | `env` always `{}` | Mock data or use external APIs |
+| No env vars | Can't access secrets | Hardcode for testing |
 
-// Avoid
-export default {
-  fetch(request, env, ctx) {
-    return fetch('https://api.example.com')
-      .then(response => response.json())
-      .then(data => new Response(JSON.stringify(data)));
-  },
-};
-```
-
-### 2. Clone Responses Before Reading
-Response bodies can only be read once:
-
-```javascript
-export default {
-  async fetch(request, env, ctx) {
-    const response = await fetch('https://api.example.com');
-    
-    // Clone before caching
-    ctx.waitUntil(caches.default.put(request, response.clone()));
-    
-    return response;
-  },
-};
-```
-
-## Common Errors
+## Common Runtime Errors
 
 ### "Response body already read"
 
-**Cause:** Attempting to read response body twice
-**Solution:** Clone response before reading: `response.clone()`
+```javascript
+// ❌ Body consumed twice
+const body = await request.text();
+await fetch(url, { body: request.body }); // Error!
+
+// ✅ Clone first
+const clone = request.clone();
+const body = await request.text();
+await fetch(url, { body: clone.body });
+```
 
 ### "Worker exceeded CPU time"
 
-**Cause:** Code execution took too long
-**Solution:** Optimize code, use `ctx.waitUntil()` for background tasks
+**Limit:** 10ms (free), 50ms (paid)
+
+```javascript
+// ✅ Move slow work to background
+ctx.waitUntil(fetch('https://analytics.example.com', {...}));
+return new Response('OK'); // Return immediately
+```
+
+### "Too many subrequests"
+
+**Limit:** 50 (free), 1000 (paid)
+
+```javascript
+// ❌ 100 individual fetches
+// ✅ Batch into single API call
+await fetch('https://api.example.com/batch', {
+  body: JSON.stringify({ ids: [...] })
+});
+```
+
+## Best Practices
+
+```javascript
+// Clone before caching
+await cache.put(request, response.clone());
+return response;
+
+// Validate input early
+if (request.method !== 'POST') return new Response('', { status: 405 });
+
+// Handle errors
+try { ... } catch (e) {
+  return Response.json({ error: e.message }, { status: 500 });
+}
+```
 
 ## Limits
 
-| Resource/Limit | Value | Notes |
-|----------------|-------|-------|
-| CPU time | 10ms (Free) / 50ms (Paid) | Per request |
-| Script size | 1 MB | Compressed |
-| Subrequests | 1000 | Per request |
+| Resource | Free | Paid |
+|----------|------|------|
+| CPU time | 10ms | 50ms |
+| Memory | 128 MB | 128 MB |
+| Subrequests | 50 | 1000 |
+
+## Browser Support
+
+| Browser | Status |
+|---------|--------|
+| Chrome | ✅ Recommended |
+| Firefox | ✅ Works |
+| Edge | ✅ Works |
+| Safari | ❌ Broken |
+
+## Debugging
+
+```javascript
+console.log('URL:', request.url); // View in browser DevTools Console
+```
+
+**Note:** `console.log` works in playground. For production, use Logpush or Tail Workers.

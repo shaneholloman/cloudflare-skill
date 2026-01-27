@@ -43,6 +43,33 @@ ls -la ~/.cloudflared/*.json         # Verify credentials
 cloudflared tunnel list              # Verify tunnel exists
 ```
 
+### "Connection already registered"
+
+**Cause:** Multiple replicas with same connector ID or stale connection
+**Solution:**
+```bash
+# Check active connections
+cloudflared tunnel info my-tunnel
+
+# Wait 60s for stale connection cleanup, or restart with new connector ID
+cloudflared tunnel run my-tunnel
+```
+
+### "Tunnel credentials rotated but connections fail"
+
+**Cause:** Old cloudflared processes using expired credentials
+**Solution:**
+```bash
+# Stop all cloudflared processes
+pkill cloudflared
+
+# Verify stopped
+ps aux | grep cloudflared
+
+# Restart with new credentials
+cloudflared tunnel run my-tunnel
+```
+
 ## Limits
 
 | Resource/Limit | Value | Notes |
@@ -51,22 +78,26 @@ cloudflared tunnel list              # Verify tunnel exists
 | Tunnel replicas | 1000 per tunnel | Max concurrent |
 | Connection duration | No hard limit | Hours to days |
 | Long-lived connections | May drop during updates | WebSocket, SSH, UDP |
+| Replica registration | ~5s TTL | Old replica dropped after 5s no heartbeat |
+| Token rotation grace | 24 hours | Old tokens work during grace period |
 
 ## Best Practices
 
 ### Security
-1. Use remotely-managed tunnels for centralized control
+1. Use token-based tunnels (config source: cloudflare) for centralized control
 2. Enable Access policies for sensitive services
 3. Rotate tunnel credentials regularly
-4. Verify TLS certs (`noTLSVerify: false`)
-5. Restrict `bastion` service type
+4. After rotation: stop all old cloudflared processes within 24h grace period
+5. Verify TLS certs (`noTLSVerify: false`)
+6. Restrict `bastion` service type
 
 ### Performance
-1. Run multiple replicas for HA
-2. Place `cloudflared` close to origin (same network)
-3. Use HTTP/2 for gRPC (`http2Origin: true`)
-4. Tune keepalive for long-lived connections
-5. Monitor connection counts
+1. Run multiple replicas for HA (2-4 typical, load balanced automatically)
+2. Replicas share same tunnel UUID, get unique connector IDs
+3. Place `cloudflared` close to origin (same network)
+4. Use HTTP/2 for gRPC (`http2Origin: true`)
+5. Tune keepalive for long-lived connections
+6. Monitor connection counts
 
 ### Configuration
 1. Use environment variables for secrets
@@ -76,11 +107,12 @@ cloudflared tunnel list              # Verify tunnel exists
 5. Document rule order (first match wins)
 
 ### Operations
-1. Monitor tunnel health in dashboard
-2. Set up disconnect alerts
+1. Monitor tunnel health in dashboard (shows active replicas)
+2. Set up disconnect alerts (when replica count drops to 0)
 3. Graceful shutdown for config updates
-4. Keep `cloudflared` updated (1 year support)
-5. Use `--no-autoupdate` in prod; control updates manually
+4. Update replicas in rolling fashion (update 1, wait, update next)
+5. Keep `cloudflared` updated (1 year support window)
+6. Use `--no-autoupdate` in prod; control updates manually
 
 ## Debug Mode
 

@@ -79,6 +79,15 @@ const accountId = new pulumi.Config("cloudflare").require("accountId");
 - `name`/`title` - Resource identifier
 - `*Bindings` - Connect resources to Workers
 
+## Reading Order
+
+| Order | File | What | When to Read |
+|-------|------|------|--------------|
+| 1 | [configuration.md](./configuration.md) | Resource config for Workers/KV/D1/R2/Queues/Pages | First time setup, resource reference |
+| 2 | [patterns.md](./patterns.md) | Architecture patterns, multi-env, component resources | Building complex apps, best practices |
+| 3 | [api.md](./api.md) | Outputs, dependencies, imports, dynamic providers | Advanced features, integrations |
+| 4 | [gotchas.md](./gotchas.md) | Common errors, troubleshooting, limits | Debugging, deployment issues |
+
 ## In This Reference
 - [configuration.md](./configuration.md) - Provider config, stack setup, Workers/bindings
 - [api.md](./api.md) - Resource types, Workers script, KV/D1/R2/queues/Pages

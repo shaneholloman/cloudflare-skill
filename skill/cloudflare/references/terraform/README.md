@@ -10,6 +10,15 @@
 - **Version pinning**: Always pin provider version with `~>` for predictable upgrades
 - **Secret management**: Use variables + environment vars for sensitive data - never hardcode API tokens
 
+## Provider Version
+
+| Version | Status | Notes |
+|---------|--------|-------|
+| 5.x | Current | Auto-generated from OpenAPI, breaking changes from v4 |
+| 4.x | Legacy | Manual maintenance, deprecated |
+
+**Critical:** v5 renamed many resources (`cloudflare_record` → `cloudflare_dns_record`, `cloudflare_worker_*` → `cloudflare_workers_*`). See [gotchas.md](./gotchas.md#v5-breaking-changes) for migration details.
+
 ## Provider Setup
 
 ### Basic Configuration
@@ -42,17 +51,7 @@ provider "cloudflare" {
    
 3. **User Service Key**: `user_service_key` for Origin CA certificates
 
-### Backend Configuration
 
-```hcl
-terraform {
-  backend "s3" {
-    bucket = "terraform-state"
-    key    = "cloudflare/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
-```
 
 ## Quick Reference: Common Commands
 
@@ -67,6 +66,29 @@ terraform output        # Show outputs
 terraform fmt -recursive  # Format code
 terraform validate      # Validate configuration
 ```
+
+## Import Existing Resources
+
+Use cf-terraforming to generate configs from existing Cloudflare resources:
+
+```bash
+# Install
+brew install cloudflare/cloudflare/cf-terraforming
+
+# Generate HCL from existing resources
+cf-terraforming generate --resource-type cloudflare_dns_record --zone <zone-id>
+
+# Import into Terraform state
+cf-terraforming import --resource-type cloudflare_dns_record --zone <zone-id>
+```
+
+## Reading Order
+
+1. Start with [README.md](./README.md) for provider setup and authentication
+2. Review [configuration.md](./configuration.md) for resource configurations
+3. Check [api.md](./api.md) for data sources and existing resource queries
+4. See [patterns.md](./patterns.md) for multi-environment and CI/CD patterns
+5. Read [gotchas.md](./gotchas.md) for state drift, v5 breaking changes, and troubleshooting
 
 ## In This Reference
 - [configuration.md](./configuration.md) - Resources for zones, DNS, workers, KV, R2, D1, Pages, rulesets

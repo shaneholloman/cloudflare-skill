@@ -9,6 +9,7 @@ Schedule Workers execution using cron expressions. Runs on Cloudflare's global n
 - **Global propagation** - 15min deployment delay
 - **At-least-once delivery** - Rare duplicate executions possible
 - **Workflow integration** - Trigger long-running multi-step tasks
+- **Green Compute** - Optional carbon-aware scheduling during low-carbon periods
 
 ## Cron Syntax
 
@@ -77,11 +78,21 @@ curl "http://localhost:8787/__scheduled?cron=*/5+*+*+*+*"
 - **Propagation:** 15min global deployment
 - **Timezone:** UTC only
 
+## Reading Order
+
+**New to cron triggers?** Start here:
+1. This README - Overview and quick start
+2. [configuration.md](./configuration.md) - Set up your first cron trigger
+3. [api.md](./api.md) - Understand the handler API
+4. [patterns.md](./patterns.md) - Common use cases and examples
+
+**Troubleshooting?** Jump to [gotchas.md](./gotchas.md)
+
 ## In This Reference
-- [configuration.md](./configuration.md) - wrangler config, env-specific schedules
-- [api.md](./api.md) - ScheduledController, handler params
-- [patterns.md](./patterns.md) - Use cases, batch processing, monitoring
-- [gotchas.md](./gotchas.md) - Timezone issues, debugging, limits
+- [configuration.md](./configuration.md) - wrangler config, env-specific schedules, Green Compute
+- [api.md](./api.md) - ScheduledController, noRetry(), waitUntil, testing patterns
+- [patterns.md](./patterns.md) - Use cases, monitoring, queue integration, Durable Objects
+- [gotchas.md](./gotchas.md) - Timezone issues, idempotency, security, testing
 
 ## See Also
 - [workflows](../workflows/) - Alternative for long-running scheduled tasks

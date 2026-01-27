@@ -9,8 +9,8 @@
 
 ### "no such table"
 
-**Cause:** Table doesn't exist because migrations haven't been run  
-**Solution:** Run migrations first using `wrangler d1 migrations apply`
+**Cause:** Table doesn't exist because migrations haven't been run, or using wrong database binding  
+**Solution:** Run migrations using `wrangler d1 migrations apply <db-name> --remote` and verify binding name in wrangler.jsonc matches code
 
 ### "UNIQUE constraint failed"
 
@@ -42,12 +42,57 @@
 **Cause:** SQLite doesn't have native DATE/TIME types  
 **Solution:** Use TEXT (ISO 8601 format) or INTEGER (unix timestamp) for date/time values
 
-## Limits
+## Plan Tier Limits
 
-| Limit | Value | Notes |
-|-------|-------|-------|
-| Database size | 10 GB | Design for multiple DBs per tenant |
-| Row size | 1 MB | Store large files in R2, not D1 |
-| Query timeout | 30s | Break long queries into smaller chunks |
-| Batch size | 10,000 statements | Split large batches |
-| Local storage | `.wrangler/state/v3/d1/<database-id>.sqlite` | Test migrations locally first |
+| Limit | Free Tier | Paid Plans | Notes |
+|-------|-----------|------------|-------|
+| Database size | 500 MB | 10 GB | Design for multiple DBs per tenant on paid |
+| Row size | 1 MB | 1 MB | Store large files in R2, not D1 |
+| Query timeout | 30s | 30s (900s with sessions) | Use sessions API for migrations |
+| Batch size | 1,000 statements | 10,000 statements | Split large batches accordingly |
+| Time Travel | 7 days | 30 days | Point-in-time recovery window |
+| Read replicas | ❌ Not available | ✅ Available | Paid add-on for lower latency |
+| Sessions API | ❌ Not available | ✅ Up to 15 min | For migrations and heavy operations |
+| Concurrent requests | 10,000/min | Higher | Contact support for custom limits |
+
+## Production Gotchas
+
+### "Batch size exceeded"
+
+**Cause:** Attempting to send >1,000 statements on free tier or >10,000 on paid  
+**Solution:** Chunk batches: `for (let i = 0; i < stmts.length; i += MAX_BATCH) await env.DB.batch(stmts.slice(i, i + MAX_BATCH))`
+
+### "Session not closed / resource leak"
+
+**Cause:** Forgot to call `session.close()` after using sessions API  
+**Solution:** Always use try/finally block: `try { await session.prepare(...) } finally { session.close() }`
+
+### "Replication lag causing stale reads"
+
+**Cause:** Reading from replica immediately after write - replication lag can be 100ms-2s  
+**Solution:** Use primary for read-after-write: `await env.DB.prepare(...)` not `env.DB_REPLICA`
+
+### "Migration applied to local but not remote"
+
+**Cause:** Forgot `--remote` flag when applying migrations  
+**Solution:** Always run `wrangler d1 migrations apply <db-name> --remote` for production
+
+### "Foreign key constraint failed"
+
+**Cause:** Inserting row with FK to non-existent parent, or deleting parent before children  
+**Solution:** Enable FK enforcement: `PRAGMA foreign_keys = ON;` and use ON DELETE CASCADE in schema
+
+### "BLOB data corrupted on export"
+
+**Cause:** D1 export may not handle BLOB correctly  
+**Solution:** Store binary files in R2, only store R2 URLs/keys in D1
+
+### "Database size approaching limit"
+
+**Cause:** Storing too much data in single database  
+**Solution:** Horizontal scale-out: create per-tenant/per-user databases, archive old data, or upgrade to paid plan
+
+### "Local dev vs production behavior differs"
+
+**Cause:** Local uses SQLite file, production uses distributed D1 - different performance/limits  
+**Solution:** Always test migrations on remote with `--remote` flag before production rollout

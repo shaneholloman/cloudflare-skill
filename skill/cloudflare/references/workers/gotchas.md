@@ -32,6 +32,89 @@
 **Cause:** Too many nested subrequests creating deep call chain  
 **Solution:** Flatten request chain or use service bindings for direct Worker-to-Worker communication
 
+### "D1 read-after-write inconsistency"
+
+**Cause:** D1 is eventually consistent; reads may not reflect recent writes  
+**Solution:** Use D1 Sessions (2024+) to guarantee read-after-write consistency within a session:
+
+```typescript
+const session = env.DB.withSession();
+await session.prepare('INSERT INTO users (name) VALUES (?)').bind('Alice').run();
+const user = await session.prepare('SELECT * FROM users WHERE name = ?').bind('Alice').first(); // Guaranteed to see Alice
+```
+
+**When to use sessions:** Write → Read patterns, transactions requiring consistency
+
+### "wrangler types not generating TypeScript definitions"
+
+**Cause:** Type generation not configured or outdated  
+**Solution:** Run `npx wrangler types` after changing bindings in wrangler.jsonc:
+
+```bash
+npx wrangler types  # Generates .wrangler/types/runtime.d.ts
+```
+
+Add to `tsconfig.json`: `"include": [".wrangler/types/**/*.ts"]`
+
+Then import: `import type { Env } from './.wrangler/types/runtime';`
+
+### "Durable Object RPC errors with deprecated fetch pattern"
+
+**Cause:** Using old `stub.fetch()` pattern instead of RPC (2024+)  
+**Solution:** Export methods directly, call via RPC:
+
+```typescript
+// ❌ Old fetch pattern
+export class MyDO {
+  async fetch(request: Request) {
+    const { method } = await request.json();
+    if (method === 'increment') return new Response(String(await this.increment()));
+  }
+  async increment() { return ++this.value; }
+}
+const stub = env.DO.get(id);
+const res = await stub.fetch('http://x', { method: 'POST', body: JSON.stringify({ method: 'increment' }) });
+
+// ✅ RPC pattern (type-safe, no serialization overhead)
+export class MyDO {
+  async increment() { return ++this.value; }
+}
+const stub = env.DO.get(id);
+const count = await stub.increment(); // Direct method call
+```
+
+### "WebSocket connection closes unexpectedly"
+
+**Cause:** Worker reaches CPU limit while maintaining WebSocket connection  
+**Solution:** Use WebSocket hibernation (2024+) to offload idle connections:
+
+```typescript
+export class WebSocketDO {
+  async webSocketMessage(ws: WebSocket, message: string) {
+    // Handle message
+  }
+  async webSocketClose(ws: WebSocket, code: number) {
+    // Cleanup
+  }
+}
+```
+
+Hibernation automatically suspends inactive connections, wakes on events
+
+### "Framework middleware not working with Workers"
+
+**Cause:** Framework expects Node.js primitives (e.g., Express uses Node streams)  
+**Solution:** Use Workers-native frameworks (Hono, itty-router, Worktop) or adapt middleware:
+
+```typescript
+// ✅ Hono (Workers-native)
+import { Hono } from 'hono';
+const app = new Hono();
+app.use('*', async (c, next) => { /* middleware */ await next(); });
+```
+
+See [frameworks.md](./frameworks.md) for full patterns
+
 ## Limits
 
 | Limit | Value | Notes |
@@ -50,3 +133,4 @@
 - [Patterns](./patterns.md) - Best practices
 - [API](./api.md) - Runtime APIs
 - [Configuration](./configuration.md) - Setup
+- [Frameworks](./frameworks.md) - Hono, routing, validation

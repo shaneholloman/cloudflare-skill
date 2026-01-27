@@ -72,6 +72,9 @@ EXPOSE 8080 3000  # Required for wrangler dev
 - `sandbox.startProcess(command, options)` → Background process
 - `sandbox.exposePort(port, options)` → Get preview URL
 - `sandbox.createSession(options)` → Isolated session
+- `sandbox.wsConnect(request, port)` → WebSocket proxy
+- `sandbox.destroy()` → Terminate container
+- `sandbox.mountBucket(bucket, path, options)` → Mount S3 storage
 
 ## Critical Rules
 

@@ -7,10 +7,18 @@ export class MyDurableObject extends DurableObject {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.sql = ctx.storage.sql;
-    this.sql.exec(`CREATE TABLE IF NOT EXISTS _meta(key TEXT PRIMARY KEY, value TEXT)`);
-    const ver = this.sql.exec("SELECT value FROM _meta WHERE key = 'schema_version'").toArray()[0]?.value || "0";
-    if (ver === "0") this.sql.exec(`CREATE TABLE users(id INTEGER PRIMARY KEY, name TEXT); INSERT OR REPLACE INTO _meta VALUES ('schema_version', '1')`);
-    if (ver === "1") this.sql.exec(`ALTER TABLE users ADD COLUMN email TEXT; UPDATE _meta SET value = '2' WHERE key = 'schema_version'`);
+    
+    // Use SQLite's built-in user_version pragma
+    const ver = this.sql.exec("PRAGMA user_version").one()?.user_version || 0;
+    
+    if (ver === 0) {
+      this.sql.exec(`CREATE TABLE users(id INTEGER PRIMARY KEY, name TEXT)`);
+      this.sql.exec("PRAGMA user_version = 1");
+    }
+    if (ver === 1) {
+      this.sql.exec(`ALTER TABLE users ADD COLUMN email TEXT`);
+      this.sql.exec("PRAGMA user_version = 2");
+    }
   }
 }
 ```
@@ -20,8 +28,11 @@ export class MyDurableObject extends DurableObject {
 ```typescript
 export class UserCache extends DurableObject {
   cache = new Map<string, User>();
-  async getUser(id: string): Promise<User> {
-    if (this.cache.has(id)) return this.cache.get(id)!;
+  async getUser(id: string): Promise<User | undefined> {
+    if (this.cache.has(id)) {
+      const cached = this.cache.get(id);
+      if (cached) return cached;
+    }
     const user = await this.ctx.storage.get<User>(`user:${id}`);
     if (user) this.cache.set(id, user);
     return user;
@@ -99,6 +110,65 @@ async increment(): Promise<Response> {
   let val = await this.ctx.storage.get("counter");
   this.ctx.storage.put("counter", val + 1);
   return new Response(String(val));
+}
+```
+
+## Parent-Child Coordination
+
+Hierarchical DO pattern where parent manages child DOs:
+
+```typescript
+// Parent DO coordinates children
+export class Workspace extends DurableObject {
+  async createDocument(name: string): Promise<string> {
+    const docId = crypto.randomUUID();
+    const childId = this.env.DOCUMENT.idFromName(`${this.ctx.id.toString()}:${docId}`);
+    const childStub = this.env.DOCUMENT.get(childId);
+    await childStub.initialize(name);
+    
+    // Track child in parent storage
+    this.sql.exec('INSERT INTO documents (id, name, created) VALUES (?, ?, ?)', 
+      docId, name, Date.now());
+    return docId;
+  }
+  
+  async listDocuments(): Promise<string[]> {
+    return this.sql.exec('SELECT id FROM documents').toArray().map(r => r.id);
+  }
+}
+
+// Child DO
+export class Document extends DurableObject {
+  async initialize(name: string) {
+    this.sql.exec('CREATE TABLE IF NOT EXISTS content(key TEXT PRIMARY KEY, value TEXT)');
+    this.sql.exec('INSERT INTO content VALUES (?, ?)', 'name', name);
+  }
+}
+```
+
+## Write Coalescing Pattern
+
+Multiple writes to same key coalesce atomically (last write wins):
+
+```typescript
+async updateMetrics(userId: string, actions: Action[]) {
+  // All writes coalesce - no await needed
+  for (const action of actions) {
+    this.ctx.storage.put(`user:${userId}:lastAction`, action.type);
+    this.ctx.storage.put(`user:${userId}:count`, 
+      await this.ctx.storage.get(`user:${userId}:count`) + 1);
+  }
+  // Output gate ensures all writes confirm before response
+  return new Response("OK");
+}
+
+// Atomic batch with SQL
+async batchUpdate(items: Item[]) {
+  this.sql.exec('BEGIN');
+  for (const item of items) {
+    this.sql.exec('INSERT OR REPLACE INTO items VALUES (?, ?)', item.id, item.value);
+  }
+  this.sql.exec('COMMIT');
 }
 ```
 

@@ -24,13 +24,56 @@
 
 ### "Verified Bot Blocked"
 
-**Cause:** Search engine bot blocked by WAF Managed Rules (not just Bot Management) or Yandex bot during IP update (48h window)  
+**Cause:** Search engine bot blocked by WAF Managed Rules (not just Bot Management)  
 **Solution:** Create WAF exception for specific rule ID and verify bot via reverse DNS
+
+### "Yandex Bot Blocked During IP Update"
+
+**Cause:** Yandex updates bot IPs; new IPs unrecognized for 48h during propagation  
+**Solution:** 
+1. Check Security Events for specific WAF rule ID blocking Yandex
+2. Create WAF exception:
+   ```txt
+   (http.user_agent contains "YandexBot" and ip.src in {<yandex-ip-range>})
+   Action: Skip (WAF Managed Ruleset)
+   ```
+3. Monitor Bot Analytics for 48h
+4. Remove exception after propagation completes
+
+Issue resolves automatically after 48h. Contact Cloudflare Support if persists.
 
 ### "JA3/JA4 Missing"
 
 **Cause:** Non-HTTPS traffic, Worker routing traffic, Orange-to-Orange traffic via Worker, or Bot Management skipped  
 **Solution:** JA3/JA4 only available for HTTPS/TLS traffic; check request routing
+
+**JA3/JA4 Not User-Unique:** Same browser/library version = same fingerprint
+- Don't use for user identification
+- Use for client profiling only
+- Fingerprints change with browser updates
+
+## Bot Verification Methods
+
+Cloudflare verifies bots via:
+
+1. **Reverse DNS (IP validation):** Traditional method—bot IP resolves to expected domain
+2. **Web Bot Auth:** Modern cryptographic verification—faster propagation
+
+When `verifiedBot=true`, bot passed at least one method.
+
+**Inactive verified bots:** IPs removed after 24h of no traffic.
+
+## Detection Engine Behavior
+
+| Engine | Score | Timing | Plan | Notes |
+|--------|-------|--------|------|-------|
+| Heuristics | Always 1 | Immediate | All | Known fingerprints—overrides ML |
+| ML | 1-99 | Immediate | All | Majority of detections |
+| Anomaly Detection | Influences | After baseline | Enterprise | Optional, baseline analysis |
+| JavaScript Detections | Pass/fail | After JS | Pro+ | Headless browser detection |
+| Cloudflare Service | N/A | N/A | Enterprise | Zero Trust internal source |
+
+**Priority:** Heuristics > ML—if heuristic matches, score=1 regardless of ML.
 
 ## Limits
 
@@ -55,7 +98,7 @@
 | WAF custom rules (Business) | 100 | Varies by plan |
 | WAF custom rules (Enterprise) | 1,000+ | Varies by plan |
 | Workers CPU time | Varies by plan | Applies to bot logic |
-| Bot Analytics sampling | 1-10% | May not capture all traffic |
+| Bot Analytics sampling | 1-10% adaptive | High-volume zones sampled more aggressively |
 | Bot Analytics history | 30 days max | Historical data retention limit |
 | CSP requirements for JSD | Must allow `/cdn-cgi/challenge-platform/` | Required for JSD to function |
 

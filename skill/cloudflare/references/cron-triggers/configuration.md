@@ -20,6 +20,44 @@
 }
 ```
 
+## Green Compute (Beta)
+
+Schedule crons during low-carbon periods for carbon-aware execution:
+
+```jsonc
+{
+  "name": "eco-cron-worker",
+  "triggers": {
+    "crons": ["0 2 * * *"]
+  },
+  "placement": {
+    "mode": "smart"  // Runs during low-carbon periods
+  }
+}
+```
+
+**Modes:**
+- `"smart"` - Carbon-aware scheduling (may delay up to 24h for optimal window)
+- Default (no placement config) - Standard scheduling (no delay)
+
+**How it works:**
+- Cloudflare delays execution until grid carbon intensity is lower
+- Maximum delay: 24 hours from scheduled time
+- Ideal for batch jobs with flexible timing requirements
+
+**Use cases:** 
+- Nightly data processing and ETL pipelines
+- Weekly/monthly report generation
+- Database backups and maintenance
+- Analytics aggregation
+- ML model training
+
+**Not suitable for:** 
+- Time-sensitive operations (SLA requirements)
+- User-facing features requiring immediate execution
+- Real-time monitoring and alerting
+- Compliance tasks with strict time windows
+
 ## Environment-Specific Schedules
 
 ```jsonc
@@ -45,37 +83,14 @@
 
 ## Schedule Format
 
-**5-field structure:**
-```
-minute hour day-of-month month day-of-week
-```
+**Structure:** `minute hour day-of-month month day-of-week`
 
-**Special characters:**
-- `*` - Any value
-- `,` - List: `1,15,30 * * * *` (minutes 1, 15, 30)
-- `-` - Range: `0 9-17 * * *` (9am-5pm)
-- `/` - Step: `*/10 * * * *` (every 10 minutes)
-- `L` - Last: `0 0 L * *` (last day of month), `0 18 * * FRI-L` (last Friday)
-- `W` - Weekday: `0 9 15W * *` (weekday nearest 15th)
-- `#` - Nth: `0 10 * * MON#1` (1st Monday)
+**Special chars:** `*` (any), `,` (list), `-` (range), `/` (step), `L` (last), `W` (weekday), `#` (nth)
 
 ## Managing Triggers
 
-**Remove all:**
-```jsonc
-{
-  "triggers": {
-    "crons": []  // Empty array removes all
-  }
-}
-```
-
-**Preserve existing:**
-```jsonc
-{
-  // Omit "triggers" entirely to keep existing crons
-}
-```
+**Remove all:** `"triggers": { "crons": [] }`  
+**Preserve existing:** Omit `"triggers"` field entirely
 
 ## Deployment
 
@@ -116,7 +131,50 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/{account_id}/workers/
   -d '{"crons": []}'
 ```
 
+## Combining Multiple Workers
+
+For complex schedules, use multiple workers:
+
+```jsonc
+// worker-frequent.jsonc
+{
+  "name": "data-sync-frequent",
+  "triggers": { "crons": ["*/5 * * * *"] }
+}
+
+// worker-daily.jsonc
+{
+  "name": "reports-daily",
+  "triggers": { "crons": ["0 2 * * *"] },
+  "placement": { "mode": "smart" }
+}
+
+// worker-weekly.jsonc
+{
+  "name": "cleanup-weekly",
+  "triggers": { "crons": ["0 3 * * SUN"] }
+}
+```
+
+**Benefits:**
+- Separate CPU limits per worker
+- Independent error isolation
+- Different Green Compute policies
+- Easier to maintain and debug
+
+## Validation
+
+**Test cron syntax:**
+- [crontab.guru](https://crontab.guru/) - Interactive validator
+- Wrangler validates on deploy but won't catch logic errors
+
+**Common mistakes:**
+- `0 0 * * *` runs daily at midnight UTC, not your local timezone
+- `*/60 * * * *` is invalid (use `0 * * * *` for hourly)
+- `0 2 31 * *` only runs on months with 31 days
+
 ## See Also
 
 - [README.md](./README.md) - Overview, quick start
 - [api.md](./api.md) - Handler implementation
+- [patterns.md](./patterns.md) - Multi-cron routing examples

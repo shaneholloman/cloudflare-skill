@@ -2,6 +2,21 @@
 
 ## Common Errors
 
+### "Container running indefinitely"
+
+**Cause:** `keepAlive: true` without calling `destroy()`
+**Solution:** Always call `destroy()` when done with keepAlive containers
+
+```typescript
+const sandbox = getSandbox(env.Sandbox, 'temp', { keepAlive: true });
+try {
+  const result = await sandbox.exec('python script.py');
+  return result.stdout;
+} finally {
+  await sandbox.destroy();  // REQUIRED to free resources
+}
+```
+
 ### "CONTAINER_NOT_READY"
 
 **Cause:** Container still provisioning (first request or after sleep)
@@ -50,45 +65,52 @@ async function execWithRetry(sandbox, cmd) {
 **Cause:** Files in `/tmp` or other ephemeral paths
 **Solution:** Use `/workspace` for persistent files
 
+### "Bucket mounting doesn't work locally"
+
+**Cause:** Bucket mounting requires FUSE, not available in `wrangler dev`
+**Solution:** Test bucket mounting in production only. Use mock data locally.
+
+### "Different normalizeId = different sandbox"
+
+**Cause:** Changing `normalizeId` option changes Durable Object ID
+**Solution:** Set `normalizeId` consistently. `normalizeId: true` lowercases the ID.
+
+```typescript
+// These create DIFFERENT sandboxes:
+getSandbox(env.Sandbox, 'MyApp');              // DO ID: hash('MyApp')
+getSandbox(env.Sandbox, 'MyApp', { normalizeId: true });  // DO ID: hash('myapp')
+```
+
+### "Code context variables disappeared"
+
+**Cause:** Container restart clears code context state
+**Solution:** Code contexts are ephemeral. Recreate context after container sleep/wake.
+
 ## Performance Optimization
 
 ### Sandbox ID Strategy
 
 ```typescript
-// ❌ BAD: Creates new sandbox every time (slow, expensive)
+// ❌ BAD: New sandbox every time (slow)
 const sandbox = getSandbox(env.Sandbox, `user-${Date.now()}`);
 
-// ✅ GOOD: Reuse sandbox per user
+// ✅ GOOD: Reuse per user
 const sandbox = getSandbox(env.Sandbox, `user-${userId}`);
-
-// ✅ GOOD: Reuse for temporary tasks
-const sandbox = getSandbox(env.Sandbox, 'shared-runner');
 ```
 
-### Sleep Configuration
+### Sleep & Traffic Config
 
 ```typescript
-// Cost-optimized: Sleep after 30min inactivity
-const sandbox = getSandbox(env.Sandbox, 'id', {
-  sleepAfter: '30m',
-  keepAlive: false
-});
+// Cost-optimized
+getSandbox(env.Sandbox, 'id', { sleepAfter: '30m', keepAlive: false });
 
-// Always-on (higher cost, faster response)
-const sandbox = getSandbox(env.Sandbox, 'id', {
-  keepAlive: true
-});
+// Always-on (requires destroy())
+getSandbox(env.Sandbox, 'id', { keepAlive: true });
 ```
 
-### Increase max_instances for High Traffic
-
 ```jsonc
-{
-  "containers": [{
-    "class_name": "Sandbox",
-    "max_instances": 50  // Allow 50 concurrent sandboxes
-  }]
-}
+// High traffic: increase max_instances
+{ "containers": [{ "class_name": "Sandbox", "max_instances": 50 }] }
 ```
 
 ## Security Best Practices
@@ -142,10 +164,22 @@ Token changes on each expose operation, preventing unauthorized access.
 
 ## Limits
 
-- **Instance types**: lite (256MB), standard (512MB), heavy (1GB)
-- **Default timeout**: 120s for exec operations
-- **First deploy**: 2-3 min for container provisioning
+| Resource | Lite | Standard | Heavy |
+|----------|------|----------|-------|
+| RAM | 256MB | 512MB | 1GB |
+| vCPU | 0.5 | 1 | 2 |
+
+| Operation | Default Timeout | Override |
+|-----------|----------------|----------|
+| Container provisioning | 30s | `SANDBOX_INSTANCE_TIMEOUT_MS` |
+| Port readiness | 90s | `SANDBOX_PORT_TIMEOUT_MS` |
+| exec() | 120s | `timeout` option |
+| sleepAfter | 10m | `sleepAfter` option |
+
+**Performance**:
+- **First deploy**: 2-3 min for container build
 - **Cold start**: 2-3s when waking from sleep
+- **Bucket mounting**: Production only (FUSE not in dev)
 
 ## Production Guide
 
